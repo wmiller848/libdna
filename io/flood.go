@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////
 //
 //    __           __       ____
-//	 /\ \       __/\ \     /\  _'\
+//   /\ \       __/\ \     /\  _'\
 //   \ \ \     /\_\ \ \____\ \ \/\ \    ___      __
 //    \ \ \  __\/\ \ \ '__'\\ \ \ \ \ /' _ '\  /'__'\
 //     \ \ \L\ \\ \ \ \ \L\ \\ \ \_\ \/\ \/\ \/\ \L\.\_
@@ -34,6 +34,9 @@ func IoReader(rdr io.Reader) Flood {
 		for {
 			n, err := rdr.Read(buf)
 			if err == io.EOF {
+				if len(lastLn) > 0 {
+					flood <- Stream{lastLn}
+				}
 				close(flood)
 				return
 			}
@@ -86,6 +89,10 @@ func IoReaderCached(rdr io.Reader, signal chan int) Flood {
 				for {
 					n, err := tmpfile.Read(buf)
 					if err == io.EOF {
+						if len(lastLn) > 0 {
+							flood <- Stream{lastLn}
+						}
+						lastLn = nil
 						break
 					}
 

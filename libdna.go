@@ -37,7 +37,7 @@ func (m *Model) AddLayer(l layer.Layer) *Model {
 
 func (m *Model) Run(stdin io.Reader) {
 	signal := make(chan int)
-	generation := 0
+	generation := 1
 	//flood := dnaio.IoReader(stdin)
 	flood := dnaio.IoReaderCached(stdin, signal)
 
@@ -49,8 +49,8 @@ func (m *Model) Run(stdin io.Reader) {
 			if !open {
 				break
 			}
-			fmt.Println(stream.String(), open)
-			if m.Trained || generation > 10 {
+			fmt.Println(stream.String(), open, generation)
+			if m.Trained || generation == 10 {
 				close(signal)
 				return
 			} else {

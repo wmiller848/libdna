@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////
 //
 //    __           __       ____
-//	 /\ \       __/\ \     /\  _'\
+//   /\ \       __/\ \     /\  _'\
 //   \ \ \     /\_\ \ \____\ \ \/\ \    ___      __
 //    \ \ \  __\/\ \ \ '__'\\ \ \ \ \ /' _ '\  /'__'\
 //     \ \ \L\ \\ \ \ \ \L\ \\ \ \_\ \/\ \/\ \/\ \L\.\_
@@ -18,6 +18,10 @@ import (
 	dnaio "github.com/wmiller848/libdna/io"
 )
 
+var (
+	UNKOWN_LAYER error = errors.New("Unkown layer config type")
+)
+
 type Layer interface {
 	Pipe(dnaio.Stream) dnaio.Stream
 	Type() string
@@ -32,6 +36,6 @@ func New(config interface{}) (Layer, error) {
 	case *PlatformLayerConfig:
 		return newPlatformLayer(config.(*PlatformLayerConfig))
 	default:
-		return nil, errors.New("Unkown layer config type")
+		return nil, UNKOWN_LAYER
 	}
 }

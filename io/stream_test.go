@@ -12,18 +12,14 @@
 
 package io
 
-type Buffer []byte
+import "testing"
 
-type Stream [][]byte
-
-func (s Stream) Flatten() Buffer {
-	bigbuf := Buffer{}
-	for _, buf := range s {
-		bigbuf = append(bigbuf, buf...)
+func TestStream(t *testing.T) {
+	stream := Stream{
+		[]byte("some data"),
+		[]byte("some other data"),
 	}
-	return bigbuf
-}
-
-func (s Stream) String() string {
-	return string(s.Flatten())
+	if stream.String() != "some datasome other data" {
+		t.Error("Stream data does not match")
+	}
 }
