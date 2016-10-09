@@ -40,5 +40,5 @@ while getopts "$optspec" optchar; do
     esac
 done
 
-docker build --no-cache -t libdna:$version `pwd`
+docker build --force-rm -t libdna:$version `pwd`
 docker run --rm libdna:$version sh -c "go test github.com/wmiller848/libdna/..."

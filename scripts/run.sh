@@ -40,6 +40,6 @@ while getopts "$optspec" optchar; do
     esac
 done
 
-docker build --no-cache -t libdna:$version `pwd`
+docker build --force-rm -t libdna:$version `pwd`
 #docker run --rm -it libdna:$version sh
 docker run --rm libdna:$version sh -c "/go/bin/flower_genus < tmp.dat"

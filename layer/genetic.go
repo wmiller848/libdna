@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////
 //
 //    __           __       ____
-//	 /\ \       __/\ \     /\  _'\
+//   /\ \       __/\ \     /\  _'\
 //   \ \ \     /\_\ \ \____\ \ \/\ \    ___      __
 //    \ \ \  __\/\ \ \ '__'\\ \ \ \ \ /' _ '\  /'__'\
 //     \ \ \L\ \\ \ \ \ \L\ \\ \ \_\ \/\ \/\ \/\ \L\.\_
@@ -29,13 +29,12 @@ func newGeneticLayer(config *GeneticLayerConfig) (*GeneticLayer, error) {
 
 type GeneticLayer struct {
 	Config   *GeneticLayerConfig
-	Actor    *dna.Program
+	Exemplar *dna.Program
 	Programs []*dna.Program
 }
 
 func (l *GeneticLayer) Pipe(stream dnaio.Stream) dnaio.Stream {
-	if l.Actor == nil {
-
+	if l.Exemplar == nil {
 		// TODO evolve a program that meets the requirments
 
 		return dnaio.Stream{}
