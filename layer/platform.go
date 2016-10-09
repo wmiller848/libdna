@@ -16,26 +16,26 @@ import (
 	dnaio "github.com/wmiller848/libdna/io"
 )
 
-type UserLayerHandler func(dnaio.Stream) dnaio.Stream
+type PlatformLayerHandler func(dnaio.Buffer) dnaio.Stream
 
-type UserLayerConfig struct {
-	Handler UserLayerHandler
+type PlatformLayerConfig struct {
+	Handler PlatformLayerHandler
 }
 
-func newUserLayer(config *UserLayerConfig) (*UserLayer, error) {
-	return &UserLayer{
+func newPlatformLayer(config *PlatformLayerConfig) (*PlatformLayer, error) {
+	return &PlatformLayer{
 		Config: config,
 	}, nil
 }
 
-type UserLayer struct {
-	Config *UserLayerConfig
+type PlatformLayer struct {
+	Config *PlatformLayerConfig
 }
 
-func (l *UserLayer) Pipe(stream dnaio.Stream) dnaio.Stream {
-	return l.Config.Handler(stream)
+func (l *PlatformLayer) Pipe(stream dnaio.Stream) dnaio.Stream {
+	return l.Config.Handler(stream.Flatten())
 }
 
-func (l *UserLayer) Type() string {
-	return "UserLayer"
+func (l *PlatformLayer) Type() string {
+	return "PlatformLayer"
 }

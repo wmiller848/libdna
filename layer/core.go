@@ -29,6 +29,8 @@ func New(config interface{}) (Layer, error) {
 		return newGeneticLayer(config.(*GeneticLayerConfig))
 	case *UserLayerConfig:
 		return newUserLayer(config.(*UserLayerConfig))
+	case *PlatformLayerConfig:
+		return newPlatformLayer(config.(*PlatformLayerConfig))
 	default:
 		return nil, errors.New("Unkown layer config type")
 	}

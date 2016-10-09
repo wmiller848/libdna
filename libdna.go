@@ -27,6 +27,7 @@ func New() *Model {
 type Model struct {
 	currentLayer int
 	Layers       []layer.Layer
+	Trained      bool
 }
 
 func (m *Model) AddLayer(l layer.Layer) *Model {
@@ -35,15 +36,28 @@ func (m *Model) AddLayer(l layer.Layer) *Model {
 }
 
 func (m *Model) Run(stdin io.Reader) {
-	flood := dnaio.IoReader(stdin)
-	m.currentLayer = 0
-	out := m.pipe(flood, m.nextLayer())
+	signal := make(chan int)
+	generation := 0
+	//flood := dnaio.IoReader(stdin)
+	flood := dnaio.IoReaderCached(stdin, signal)
+
 	for {
-		stream, open := <-out
-		if !open {
-			return
+		m.currentLayer = 0
+		out := m.pipe(flood, m.nextLayer())
+		for {
+			stream, open := <-out
+			if !open {
+				break
+			}
+			fmt.Println(stream.String(), open)
+			if m.Trained || generation > 10 {
+				close(signal)
+				return
+			} else {
+				generation++
+				signal <- generation
+			}
 		}
-		fmt.Println(stream.String(), open)
 	}
 }
 
