@@ -16,19 +16,24 @@ import (
 	dnaio "github.com/wmiller848/libdna/io"
 )
 
+type UserLayerHandler func(dnaio.Buffer) dnaio.Stream
+
 type UserLayerConfig struct {
+	Handler UserLayerHandler
 }
 
 func newUserLayer(config *UserLayerConfig) (*UserLayer, error) {
-	return &UserLayer{}, nil
+	return &UserLayer{
+		Config: config,
+	}, nil
 }
 
 type UserLayer struct {
+	Config *UserLayerConfig
 }
 
-func (l *UserLayer) Pipe(dnaio.Flood) dnaio.Flood {
-	flood := make(dnaio.Flood)
-	return flood
+func (l *UserLayer) Pipe(stream dnaio.Stream) dnaio.Stream {
+	return l.Config.Handler(stream.Flatten())
 }
 
 func (l *UserLayer) Type() string {

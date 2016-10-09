@@ -19,7 +19,7 @@ import (
 )
 
 type Layer interface {
-	Pipe(dnaio.Flood) dnaio.Flood
+	Pipe(dnaio.Stream) dnaio.Stream
 	Type() string
 }
 
@@ -30,6 +30,6 @@ func New(config interface{}) (Layer, error) {
 	case *UserLayerConfig:
 		return newUserLayer(config.(*UserLayerConfig))
 	default:
-		return nil, errors.New("unkown layer config type")
+		return nil, errors.New("Unkown layer config type")
 	}
 }

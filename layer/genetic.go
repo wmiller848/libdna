@@ -13,6 +13,7 @@
 package layer
 
 import (
+	"github.com/wmiller848/libdna/dna"
 	dnaio "github.com/wmiller848/libdna/io"
 )
 
@@ -21,15 +22,25 @@ type GeneticLayerConfig struct {
 }
 
 func newGeneticLayer(config *GeneticLayerConfig) (*GeneticLayer, error) {
-	return &GeneticLayer{}, nil
+	return &GeneticLayer{
+		Config: config,
+	}, nil
 }
 
 type GeneticLayer struct {
+	Config   *GeneticLayerConfig
+	Actor    *dna.Program
+	Programs []*dna.Program
 }
 
-func (l *GeneticLayer) Pipe(dnaio.Flood) dnaio.Flood {
-	flood := make(dnaio.Flood)
-	return flood
+func (l *GeneticLayer) Pipe(stream dnaio.Stream) dnaio.Stream {
+	if l.Actor == nil {
+
+		// TODO evolve a program that meets the requirments
+
+		return dnaio.Stream{}
+	}
+	return stream
 }
 
 func (l *GeneticLayer) Type() string {

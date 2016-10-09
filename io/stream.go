@@ -12,4 +12,18 @@
 
 package io
 
-type Stream []uint8
+type Buffer []byte
+
+type Stream [][]byte
+
+func (s Stream) Flatten() Buffer {
+	bigbuf := Buffer{}
+	for _, buf := range s {
+		bigbuf = append(bigbuf, buf...)
+	}
+	return bigbuf
+}
+
+func (s Stream) String() string {
+	return string(s.Flatten())
+}

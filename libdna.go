@@ -16,6 +16,7 @@ import (
 	"fmt"
 	"io"
 
+	dnaio "github.com/wmiller848/libdna/io"
 	"github.com/wmiller848/libdna/layer"
 )
 
@@ -24,7 +25,8 @@ func New() *Model {
 }
 
 type Model struct {
-	Layers []layer.Layer
+	currentLayer int
+	Layers       []layer.Layer
 }
 
 func (m *Model) AddLayer(l layer.Layer) *Model {
@@ -33,5 +35,47 @@ func (m *Model) AddLayer(l layer.Layer) *Model {
 }
 
 func (m *Model) Run(stdin io.Reader) {
-	fmt.Println("test 123")
+	flood := dnaio.IoReader(stdin)
+	m.currentLayer = 0
+	out := m.pipe(flood, m.nextLayer())
+	for {
+		stream, open := <-out
+		if !open {
+			return
+		}
+		fmt.Println(stream.String(), open)
+	}
+}
+
+func (m *Model) pipe(flood dnaio.Flood, l layer.Layer) dnaio.Flood {
+	if l == nil {
+		return flood
+	}
+	downstream := make(dnaio.Flood)
+	go func() {
+		for {
+			stream, open := <-flood
+			if len(stream) > 0 {
+				downstream <- l.Pipe(stream)
+			}
+			if !open {
+				close(downstream)
+				return
+			}
+		}
+	}()
+	return m.pipe(downstream, m.nextLayer())
+}
+
+func (m *Model) nextLayer() layer.Layer {
+	defer m.tickLayer()
+	if m.currentLayer < len(m.Layers) {
+		return m.Layers[m.currentLayer]
+	} else {
+		return nil
+	}
+}
+
+func (m *Model) tickLayer() {
+	m.currentLayer++
 }
