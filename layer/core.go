@@ -10,28 +10,26 @@
 //
 ///////////////////////////////////////////////////////
 
-package libdna
+package layer
 
 import (
-	"fmt"
-	"io"
+	"errors"
 
-	"github.com/wmiller848/libdna/layer"
+	dnaio "github.com/wmiller848/libdna/io"
 )
 
-func New() *Model {
-	return &Model{}
+type Layer interface {
+	Pipe(dnaio.Flood) dnaio.Flood
+	Type() string
 }
 
-type Model struct {
-	Layers []layer.Layer
-}
-
-func (m *Model) AddLayer(l layer.Layer) *Model {
-	m.Layers = append(m.Layers, l)
-	return m
-}
-
-func (m *Model) Run(stdin io.Reader) {
-	fmt.Println("test 123")
+func New(config interface{}) (Layer, error) {
+	switch config.(type) {
+	case *GeneticLayerConfig:
+		return newGeneticLayer(config.(*GeneticLayerConfig))
+	case *UserLayerConfig:
+		return newUserLayer(config.(*UserLayerConfig))
+	default:
+		return nil, errors.New("unkown layer config type")
+	}
 }

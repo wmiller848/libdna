@@ -10,28 +10,6 @@
 //
 ///////////////////////////////////////////////////////
 
-package libdna
+package io
 
-import (
-	"fmt"
-	"io"
-
-	"github.com/wmiller848/libdna/layer"
-)
-
-func New() *Model {
-	return &Model{}
-}
-
-type Model struct {
-	Layers []layer.Layer
-}
-
-func (m *Model) AddLayer(l layer.Layer) *Model {
-	m.Layers = append(m.Layers, l)
-	return m
-}
-
-func (m *Model) Run(stdin io.Reader) {
-	fmt.Println("test 123")
-}
+type Stream []uint8

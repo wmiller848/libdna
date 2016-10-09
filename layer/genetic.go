@@ -10,28 +10,28 @@
 //
 ///////////////////////////////////////////////////////
 
-package libdna
+package layer
 
 import (
-	"fmt"
-	"io"
-
-	"github.com/wmiller848/libdna/layer"
+	dnaio "github.com/wmiller848/libdna/io"
 )
 
-func New() *Model {
-	return &Model{}
+type GeneticLayerConfig struct {
+	Labled bool
 }
 
-type Model struct {
-	Layers []layer.Layer
+func newGeneticLayer(config *GeneticLayerConfig) (*GeneticLayer, error) {
+	return &GeneticLayer{}, nil
 }
 
-func (m *Model) AddLayer(l layer.Layer) *Model {
-	m.Layers = append(m.Layers, l)
-	return m
+type GeneticLayer struct {
 }
 
-func (m *Model) Run(stdin io.Reader) {
-	fmt.Println("test 123")
+func (l *GeneticLayer) Pipe(dnaio.Flood) dnaio.Flood {
+	flood := make(dnaio.Flood)
+	return flood
+}
+
+func (l *GeneticLayer) Type() string {
+	return "GeneticLayer"
 }

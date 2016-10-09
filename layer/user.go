@@ -10,28 +10,27 @@
 //
 ///////////////////////////////////////////////////////
 
-package libdna
+package layer
 
 import (
-	"fmt"
-	"io"
-
-	"github.com/wmiller848/libdna/layer"
+	dnaio "github.com/wmiller848/libdna/io"
 )
 
-func New() *Model {
-	return &Model{}
+type UserLayerConfig struct {
 }
 
-type Model struct {
-	Layers []layer.Layer
+func newUserLayer(config *UserLayerConfig) (*UserLayer, error) {
+	return &UserLayer{}, nil
 }
 
-func (m *Model) AddLayer(l layer.Layer) *Model {
-	m.Layers = append(m.Layers, l)
-	return m
+type UserLayer struct {
 }
 
-func (m *Model) Run(stdin io.Reader) {
-	fmt.Println("test 123")
+func (l *UserLayer) Pipe(dnaio.Flood) dnaio.Flood {
+	flood := make(dnaio.Flood)
+	return flood
+}
+
+func (l *UserLayer) Type() string {
+	return "UserLayer"
 }
