@@ -60,16 +60,20 @@ func (b *Block4x3) Bases() []Base {
 	return b.bases[:]
 }
 
-func (b *Block4x3) encodingHandler(indicies ...Base) (Codon, error) {
-	if len(indicies) != 3 {
-		return nil, errors.New("Invalid strand size, must be 3 bytes")
-	}
-	return b.encoding[indicies[0]][indicies[1]][indicies[2]], nil
-}
+//func (b *Block4x3) encodingHandler(indicies ...Base) (Codon, error) {
+//if len(indicies) != 3 {
+//return nil, errors.New("Invalid strand size, must be 3 bytes")
+//}
 
-func (b *Block4x3) Encoding() EncodingFunction {
-	return b.encodingHandler
-}
+//c0 := b.Match(indicies[0])
+//c1 := b.Match(indicies[1])
+//c2 := b.Match(indicies[2])
+//return b.encoding[c0][c1][c2], nil
+//}
+
+//func (b *Block4x3) Encoding() EncodingFunction {
+//return b.Decode
+//}
 
 func (b *Block4x3) Random() *DNA {
 	dna := &DNA{

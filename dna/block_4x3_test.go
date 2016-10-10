@@ -87,30 +87,30 @@ func TestBlock4x3Decoding(t *testing.T) {
 	AssertStr(t, string(codonEnd), ">")
 }
 
-func TestBlock4x3Encoding(t *testing.T) {
-	blk := InitBlock(t)
-	encodingFunc := blk.Encoding()
-	codon, err := encodingFunc(0x00, 0x00, 0x00)
-	if err != nil {
-		t.Fatal(err.Error())
-	}
-	AssertStr(t, string(codon), string(CodonStart))
+//func TestBlock4x3Encoding(t *testing.T) {
+//blk := InitBlock(t)
+//encodingFunc := blk.Encoding()
+//codon, err := encodingFunc(0x00, 0x00, 0x00)
+//if err != nil {
+//t.Fatal(err.Error())
+//}
+//AssertStr(t, string(codon), string(CodonStart))
 
-	codon, err = encodingFunc(0x40, 0x40, 0x40)
-	if err != nil {
-		t.Fatal(err.Error())
-	}
-	AssertStr(t, string(codon), "a")
+//codon, err = encodingFunc(0x40, 0x40, 0x40)
+//if err != nil {
+//t.Fatal(err.Error())
+//}
+//AssertStr(t, string(codon), "a")
 
-	codon, err = encodingFunc(0x80, 0x80, 0x80)
-	if err != nil {
-		t.Fatal(err.Error())
-	}
-	AssertStr(t, string(codon), "b")
+//codon, err = encodingFunc(0x80, 0x80, 0x80)
+//if err != nil {
+//t.Fatal(err.Error())
+//}
+//AssertStr(t, string(codon), "b")
 
-	codon, err = encodingFunc(0xc0, 0xc0, 0xc0)
-	if err != nil {
-		t.Fatal(err.Error())
-	}
-	AssertStr(t, string(codon), string(CodonStop))
-}
+//codon, err = encodingFunc(0xc0, 0xc0, 0xc0)
+//if err != nil {
+//t.Fatal(err.Error())
+//}
+//AssertStr(t, string(codon), string(CodonStop))
+//}

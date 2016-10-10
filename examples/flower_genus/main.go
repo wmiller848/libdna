@@ -40,7 +40,8 @@ func main() {
 
 	// Build a genetic layer to learn from labled data
 	gConfig := &layer.GeneticLayerConfig{
-		Labled: true,
+		Labled:     true,
+		Population: 10,
 	}
 	classifyLayer, err := layer.New(gConfig)
 	if err != nil {

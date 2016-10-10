@@ -12,24 +12,36 @@
 
 package dna
 
+import (
+	"errors"
+	"fmt"
+)
+
 type DNA struct {
 	strand []byte
 	block  Block
 }
 
-func New(config *BlockConfig) *DNA {
+func New(config *BlockConfig) (*DNA, error) {
+	var dna *DNA
 	switch config.Size {
 	case FOUR_BY_THREE:
+		block, err := NewBlock4x3(Block4x3Bases, config.Codex)
+		if err != nil {
+			return nil, err
+		}
+		dna = block.Random()
+		fmt.Println(dna.Unwind())
 	default:
+		return nil, errors.New("Unkown dna block size")
 	}
-	return &DNA{}
+	return dna, nil
 }
 
 func (d *DNA) Unwind() CodexGigas {
 	strand := d.strand
 	leng := len(strand)
 	codexGigas := CodexGigas{}
-	// TODO 3 should be block size
 	for i := 0; i < 3; i++ {
 		codex := Codex{}
 		for j := 0; j < leng; j += 3 {

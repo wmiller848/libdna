@@ -18,14 +18,15 @@ const (
 type BlockSize uint
 
 type BlockConfig struct {
-	Size BlockSize
+	Size  BlockSize
+	Codex Codex
 }
 
 type EncodingFunction func(indicies ...Base) (Codon, error)
 
 type Block interface {
 	Bases() []Base
-	Encoding() EncodingFunction
+	//Encoding() EncodingFunction
 	Random() *DNA
 	Match(Base) Base
 	Decode(...Base) (Codon, error)
