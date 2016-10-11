@@ -28,10 +28,10 @@ func newGeneticLayer(config *GeneticLayerConfig) (*GeneticLayer, error) {
 	programs := make([]*dna.Program, config.Population)
 	for i := 0; i < config.Population; i++ {
 		program, err := dna.NewProgram()
-		fmt.Println(program)
 		if err != nil {
 			return nil, err
 		}
+		programs[i] = program
 	}
 	return &GeneticLayer{
 		Config:   config,
@@ -55,7 +55,9 @@ func (l *GeneticLayer) Pipe(stream dnaio.Stream) dnaio.Stream {
 			dataStream := stream[:streamLen-1]
 			assertStream := dnaio.Stream{stream[streamLen-1]}
 
+			//
 			for i, _ := range l.programs {
+				points[i] = 0
 				outputStream := l.programs[i].Evaluate(dataStream)
 				if len(outputStream) == len(assertStream) {
 					points[i] += 10
@@ -73,6 +75,11 @@ func (l *GeneticLayer) Pipe(stream dnaio.Stream) dnaio.Stream {
 						}
 					}
 				}
+			}
+			fmt.Println(points)
+			//
+			for i, v := range points {
+				fmt.Println(i, v)
 			}
 		} else {
 			// Unsupervised

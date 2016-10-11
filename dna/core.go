@@ -65,3 +65,43 @@ func (d *DNA) Unwind() CodexGigas {
 	}
 	return codexGigas
 }
+
+func (d *DNA) Sequence(codexGigas CodexGigas) chan *Sequence {
+	chanSeq := make(chan *Sequence)
+	go func() {
+		for codexID, codex := range codexGigas {
+			i := 0
+			index := 0
+			elements := 0
+			reading := false
+			codexDecoded := Codex{}
+			for _, codon := range codex {
+				if string(codon) == string(CodonStart) {
+					reading = true
+					index = i
+				} else if string(codon) != string(CodonStop) && reading == true {
+					codexDecoded = append(codexDecoded, codon)
+					elements++
+				} else if string(codon) == string(CodonStop) && reading == true {
+					if len(codexDecoded) == 0 {
+						reading = false
+						continue
+					}
+					seq := &Sequence{
+						Codex:    codexDecoded,
+						CodexID:  codexID,
+						Index:    index + codexID,
+						Elements: elements,
+					}
+					chanSeq <- seq
+					codexDecoded = Codex{}
+					elements = 0
+					reading = false
+				}
+				i++
+			}
+		}
+		close(chanSeq)
+	}()
+	return chanSeq
+}
