@@ -43,7 +43,7 @@ func (s *SequenceNode) String() string {
 
 func (s *SequenceNode) Bytes() []byte {
 	bytes := []byte{}
-	bytes = append(bytes, s.Sequence.Codex...)
+	bytes = append(bytes, s.Sequence.Codex.Bytes()...)
 	if s.Child != nil {
 		bytes = append(bytes, s.Child.Bytes()...)
 	}

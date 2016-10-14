@@ -33,4 +33,12 @@ func (c Codex) String() string {
 	return str
 }
 
+func (c Codex) Bytes() []byte {
+	bytes := []byte{}
+	for _, codon := range c {
+		bytes = append(bytes, codon...)
+	}
+	return bytes
+}
+
 type CodexGigas []Codex
