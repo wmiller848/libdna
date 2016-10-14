@@ -45,6 +45,7 @@ func (s *SequenceNode) Bytes() []byte {
 	bytes := []byte{}
 	bytes = append(bytes, s.Sequence.Codex.Bytes()...)
 	if s.Child != nil {
+		bytes = append(bytes, byte(' '))
 		bytes = append(bytes, s.Child.Bytes()...)
 	}
 	return bytes

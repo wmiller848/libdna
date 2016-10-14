@@ -12,10 +12,7 @@
 
 package dna
 
-import (
-	"errors"
-	"fmt"
-)
+import "errors"
 
 type DNA struct {
 	strand []byte
@@ -31,10 +28,10 @@ func New(config *BlockConfig) (*DNA, error) {
 			return nil, err
 		}
 		dna = block.Random()
-		geneBytes, err := dna.MarshalGenes()
-		if err == nil {
-			fmt.Println(string(geneBytes))
-		}
+		//geneBytes, err := dna.MarshalGenes()
+		//if err == nil {
+		//fmt.Println(string(geneBytes))
+		//}
 	default:
 		return nil, errors.New("Unkown dna block size")
 	}

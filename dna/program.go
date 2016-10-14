@@ -12,7 +12,11 @@
 
 package dna
 
-import dnaio "github.com/wmiller848/libdna/io"
+import (
+	"fmt"
+
+	dnaio "github.com/wmiller848/libdna/io"
+)
 
 func NewProgram() (*Program, error) {
 	codex := Codex{
@@ -44,5 +48,9 @@ type Program struct {
 }
 
 func (p *Program) Evaluate(stream dnaio.Stream) dnaio.Stream {
+	geneBytes, err := p.dna.MarshalGenes()
+	if err == nil {
+		fmt.Println(string(geneBytes))
+	}
 	return stream
 }
