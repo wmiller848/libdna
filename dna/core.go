@@ -31,7 +31,10 @@ func New(config *BlockConfig) (*DNA, error) {
 			return nil, err
 		}
 		dna = block.Random()
-		fmt.Println(dna.Unwind())
+		geneBytes, err := dna.MarshalGenes()
+		if err == nil {
+			fmt.Println(string(geneBytes))
+		}
 	default:
 		return nil, errors.New("Unkown dna block size")
 	}
@@ -90,13 +93,13 @@ func (d *DNA) Sequence(codexGigas CodexGigas) chan *Sequence {
 					seq := &Sequence{
 						Codex:    codexDecoded,
 						CodexID:  codexID,
-						Index:    index + codexID,
+						Index:    codexID + index,
 						Elements: elements,
 					}
 					chanSeq <- seq
-					codexDecoded = Codex{}
 					elements = 0
 					reading = false
+					codexDecoded = Codex{}
 				}
 				i++
 			}
@@ -104,4 +107,57 @@ func (d *DNA) Sequence(codexGigas CodexGigas) chan *Sequence {
 		close(chanSeq)
 	}()
 	return chanSeq
+}
+
+func (d *DNA) SpliceSequence(chanSeq chan *Sequence) *SequenceNode {
+	var dnaSeq *SequenceNode
+	var head0 *SequenceNode
+	var head1 *SequenceNode
+	var head2 *SequenceNode
+	for {
+		seq, open := <-chanSeq
+		if open == false {
+			break
+		}
+		switch seq.CodexID {
+		case 0:
+			if head0 == nil {
+				head0 = seq.Node()
+			} else {
+				head0 = head0.Merge(seq)
+			}
+		case 1:
+			if head1 == nil {
+				head1 = seq.Node()
+			} else {
+				head1 = head1.Merge(seq)
+			}
+		case 2:
+			if head2 == nil {
+				head2 = seq.Node()
+			} else {
+				head2 = head2.Merge(seq)
+			}
+		}
+	}
+	dnaSeq = head0
+	if dnaSeq == nil || (head1 != nil && dnaSeq.Index > head1.Index) {
+		dnaSeq = head1
+	}
+	if dnaSeq == nil || (head2 != nil && dnaSeq.Index > head2.Index) {
+		dnaSeq = head2
+	}
+	return dnaSeq
+}
+
+func (d *DNA) MarshalGenes() ([]byte, error) {
+	codexGigas := d.Unwind()
+	channel := d.Sequence(codexGigas)
+	dnaSeq := d.SpliceSequence(channel)
+
+	if dnaSeq != nil {
+		return dnaSeq.Bytes(), nil
+	} else {
+		return nil, errors.New("Unable to sequence genes")
+	}
 }

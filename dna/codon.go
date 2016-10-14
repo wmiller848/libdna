@@ -12,8 +12,9 @@
 
 package dna
 
-const SeedBase int = 100
-const SeedMax int = 200
+const Seed int = 1024
+
+//const SeedMax int = 2048
 
 type Base byte
 

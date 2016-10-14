@@ -10,25 +10,4 @@
 //
 ///////////////////////////////////////////////////////
 
-package dna
-
-const (
-	FOUR_BY_THREE BlockSize = 0
-)
-
-type BlockSize uint
-
-type BlockConfig struct {
-	Size  BlockSize
-	Codex Codex
-}
-
-type EncodingFunction func(indicies ...Base) (Codon, error)
-
-type Block interface {
-	Bases() []Base
-	//Encoding() EncodingFunction
-	Random() *DNA
-	Match(Base) Base
-	Decode(...Base) (Codon, error)
-}
+package gene

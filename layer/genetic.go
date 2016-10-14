@@ -13,8 +13,6 @@
 package layer
 
 import (
-	"fmt"
-
 	"github.com/wmiller848/libdna/dna"
 	dnaio "github.com/wmiller848/libdna/io"
 )
@@ -76,11 +74,11 @@ func (l *GeneticLayer) Pipe(stream dnaio.Stream) dnaio.Stream {
 					}
 				}
 			}
-			fmt.Println(points)
+			//fmt.Println(points)
 			//
-			for i, v := range points {
-				fmt.Println(i, v)
-			}
+			//for i, v := range points {
+			//fmt.Println(i, v)
+			//}
 		} else {
 			// Unsupervised
 
