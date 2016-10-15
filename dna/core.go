@@ -12,7 +12,16 @@
 
 package dna
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+
+	"github.com/wmiller848/libdna/dna/gene"
+)
+
+const Seed int = 1024
+
+//const SeedMax int = 2048
 
 type DNA struct {
 	strand []byte
@@ -28,22 +37,19 @@ func New(config *BlockConfig) (*DNA, error) {
 			return nil, err
 		}
 		dna = block.Random()
-		//geneBytes, err := dna.MarshalGenes()
-		//if err == nil {
-		//fmt.Println(string(geneBytes))
-		//}
 	default:
 		return nil, errors.New("Unkown dna block size")
 	}
 	return dna, nil
 }
 
-func (d *DNA) Unwind() CodexGigas {
+func (d *DNA) Unwind() gene.CodexGigas {
 	strand := d.strand
 	leng := len(strand)
-	codexGigas := CodexGigas{}
+	codexGigas := gene.CodexGigas{}
+	// TODO make not hard coded 3
 	for i := 0; i < 3; i++ {
-		codex := Codex{}
+		codex := gene.Codex{}
 		for j := 0; j < leng; j += 3 {
 			t0 := i + 0 + j
 			t1 := i + 1 + j
@@ -57,7 +63,7 @@ func (d *DNA) Unwind() CodexGigas {
 			if t2 > leng-1 {
 				t2 -= leng
 			}
-			strand_frag := []Base{Base(strand[t0]), Base(strand[t1]), Base(strand[t2])}
+			strand_frag := []gene.Base{gene.Base(strand[t0]), gene.Base(strand[t1]), gene.Base(strand[t2])}
 			codon, _ := d.block.Decode(strand_frag...)
 			codex = append(codex, codon)
 		}
@@ -66,7 +72,7 @@ func (d *DNA) Unwind() CodexGigas {
 	return codexGigas
 }
 
-func (d *DNA) Sequence(codexGigas CodexGigas) chan *Sequence {
+func (d *DNA) Sequence(codexGigas gene.CodexGigas) chan *Sequence {
 	chanSeq := make(chan *Sequence)
 	go func() {
 		for codexID, codex := range codexGigas {
@@ -74,15 +80,15 @@ func (d *DNA) Sequence(codexGigas CodexGigas) chan *Sequence {
 			index := 0
 			elements := 0
 			reading := false
-			codexDecoded := Codex{}
+			codexDecoded := gene.Codex{}
 			for _, codon := range codex {
-				if string(codon) == string(CodonStart) {
+				if string(codon) == string(gene.CodonStart) {
 					reading = true
 					index = i
-				} else if string(codon) != string(CodonStop) && reading == true {
+				} else if string(codon) != string(gene.CodonStop) && reading == true {
 					codexDecoded = append(codexDecoded, codon)
 					elements++
-				} else if string(codon) == string(CodonStop) && reading == true {
+				} else if string(codon) == string(gene.CodonStop) && reading == true {
 					if len(codexDecoded) == 0 {
 						reading = false
 						continue
@@ -96,7 +102,7 @@ func (d *DNA) Sequence(codexGigas CodexGigas) chan *Sequence {
 					chanSeq <- seq
 					elements = 0
 					reading = false
-					codexDecoded = Codex{}
+					codexDecoded = gene.Codex{}
 				}
 				i++
 			}
@@ -151,6 +157,14 @@ func (d *DNA) MarshalGenes() ([]byte, error) {
 	codexGigas := d.Unwind()
 	channel := d.Sequence(codexGigas)
 	dnaSeq := d.SpliceSequence(channel)
+	seq := dnaSeq
+	for seq != nil {
+		g, err := gene.New(seq.Sequence.Codex)
+		if g != nil && err != nil {
+			fmt.Println(g)
+		}
+		seq = seq.Child
+	}
 
 	if dnaSeq != nil {
 		return dnaSeq.Bytes(), nil

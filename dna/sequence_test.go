@@ -12,13 +12,17 @@
 
 package dna
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/wmiller848/libdna/dna/gene"
+)
 
 func TestSequence(t *testing.T) {
 	seq := &Sequence{
-		Codex: Codex{
-			Codon("a"),
-			Codon("b"),
+		Codex: gene.Codex{
+			gene.Codon("a"),
+			gene.Codon("b"),
 		},
 	}
 
@@ -30,9 +34,9 @@ func TestSequence(t *testing.T) {
 
 func TestSequenceNodeString(t *testing.T) {
 	seq := &Sequence{
-		Codex: Codex{
-			Codon("a"),
-			Codon("b"),
+		Codex: gene.Codex{
+			gene.Codon("a"),
+			gene.Codon("b"),
 		},
 	}
 
@@ -42,9 +46,9 @@ func TestSequenceNodeString(t *testing.T) {
 
 func TestSequenceNodeBytes(t *testing.T) {
 	seq := &Sequence{
-		Codex: Codex{
-			Codon("a"),
-			Codon("b"),
+		Codex: gene.Codex{
+			gene.Codon("a"),
+			gene.Codon("b"),
 		},
 	}
 
@@ -54,11 +58,11 @@ func TestSequenceNodeBytes(t *testing.T) {
 
 func TestSequenceNodeClone(t *testing.T) {
 	seq := &Sequence{
-		Codex: Codex{
-			Codon("a"),
-			Codon("b"),
-			Codon("c"),
-			Codon("d"),
+		Codex: gene.Codex{
+			gene.Codon("a"),
+			gene.Codon("b"),
+			gene.Codon("c"),
+			gene.Codon("d"),
 		},
 	}
 
@@ -70,17 +74,17 @@ func TestSequenceNodeClone(t *testing.T) {
 func TestSequenceNodeMerge(t *testing.T) {
 	seq1 := &Sequence{
 		Index: 1,
-		Codex: Codex{
-			Codon("a"),
-			Codon("b"),
+		Codex: gene.Codex{
+			gene.Codon("a"),
+			gene.Codon("b"),
 		},
 	}
 
 	seq2 := &Sequence{
 		Index: 0,
-		Codex: Codex{
-			Codon("c"),
-			Codon("d"),
+		Codex: gene.Codex{
+			gene.Codon("c"),
+			gene.Codon("d"),
 		},
 	}
 

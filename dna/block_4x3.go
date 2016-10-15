@@ -17,41 +17,43 @@ import (
 	"errors"
 	"fmt"
 	"math"
+
+	"github.com/wmiller848/libdna/dna/gene"
 )
 
-var Block4x3Bases [4]Base = [4]Base{0x00, 0x40, 0x80, 0xc0}
+var Block4x3Bases [4]gene.Base = [4]gene.Base{0x00, 0x40, 0x80, 0xc0}
 
 type Block4x3 struct {
-	bases    [4]Base
-	encoding map[Base]map[Base]map[Base]Codon
+	bases    [4]gene.Base
+	encoding map[gene.Base]map[gene.Base]map[gene.Base]gene.Codon
 }
 
-func NewBlock4x3(bases [4]Base, codex Codex) (*Block4x3, error) {
+func NewBlock4x3(bases [4]gene.Base, codex gene.Codex) (*Block4x3, error) {
 	baseSize := int(math.Pow(4, 3))
 	if len(codex) > baseSize-2 {
 		return nil, errors.New("Codexs can have a max of 62 items")
 	}
 	blk := &Block4x3{
 		bases:    bases,
-		encoding: make(map[Base]map[Base]map[Base]Codon),
+		encoding: make(map[gene.Base]map[gene.Base]map[gene.Base]gene.Codon),
 	}
 
 	i := 0
 	u := 0
 	// First Encoding Codon is start
-	codexPool := append([]Codon{CodonStart}, codex...)
+	codexPool := append([]gene.Codon{gene.CodonStart}, codex...)
 	// Last Encoding Codon is stop
-	codexPool = append(codexPool, CodonStop)
+	codexPool = append(codexPool, gene.CodonStop)
 	dist := baseSize / len(codexPool)
 	cursor := codexPool[u]
 	for _, b1 := range bases {
 		for _, b2 := range bases {
 			for _, b3 := range bases {
 				if blk.encoding[b1] == nil {
-					blk.encoding[b1] = make(map[Base]map[Base]Codon)
+					blk.encoding[b1] = make(map[gene.Base]map[gene.Base]gene.Codon)
 				}
 				if blk.encoding[b1][b2] == nil {
-					blk.encoding[b1][b2] = make(map[Base]Codon)
+					blk.encoding[b1][b2] = make(map[gene.Base]gene.Codon)
 				}
 				i++
 				if i%dist == 0 && i != baseSize {
@@ -68,7 +70,7 @@ func NewBlock4x3(bases [4]Base, codex Codex) (*Block4x3, error) {
 	return blk, nil
 }
 
-func (b *Block4x3) Bases() []Base {
+func (b *Block4x3) Bases() []gene.Base {
 	return b.bases[:]
 }
 
@@ -100,7 +102,7 @@ func (b *Block4x3) Random() *DNA {
 	return dna
 }
 
-func (b *Block4x3) Match(frag Base) Base {
+func (b *Block4x3) Match(frag gene.Base) gene.Base {
 	if frag >= b.bases[0] && frag < b.bases[1] {
 		return b.bases[0]
 	} else if frag >= b.bases[1] && frag < b.bases[2] {
@@ -113,7 +115,7 @@ func (b *Block4x3) Match(frag Base) Base {
 	return 0x00
 }
 
-func (b *Block4x3) Decode(indicies ...Base) (Codon, error) {
+func (b *Block4x3) Decode(indicies ...gene.Base) (gene.Codon, error) {
 	if len(indicies) != 3 {
 		return nil, errors.New("Invalid strand size, must be 3 bytes")
 	}

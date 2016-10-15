@@ -10,29 +10,15 @@
 //
 ///////////////////////////////////////////////////////
 
-package dna
+package gene
 
-import (
-	"github.com/wmiller848/libdna/dna/gene"
-)
-
-const (
-	FOUR_BY_THREE BlockSize = 0
-)
-
-type BlockSize uint
-
-type BlockConfig struct {
-	Size  BlockSize
-	Codex gene.Codex
+type Stream struct {
 }
 
-type EncodingFunction func(indicies ...gene.Base) (gene.Codon, error)
+func NewStreamGene(codex Codex) *Stream {
+	return &Stream{}
+}
 
-type Block interface {
-	Bases() []gene.Base
-	//Encoding() EncodingFunction
-	Random() *DNA
-	Match(gene.Base) gene.Base
-	Decode(...gene.Base) (gene.Codon, error)
+func (s *Stream) Type() string {
+	return "stream"
 }

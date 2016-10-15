@@ -10,15 +10,15 @@
 //
 ///////////////////////////////////////////////////////
 
-package dna
-
-const Seed int = 1024
-
-//const SeedMax int = 2048
+package gene
 
 type Base byte
 
 type Codon []byte
+
+func (c Codon) String() string {
+	return string(c)
+}
 
 var CodonStart Codon = Codon("<")
 var CodonStop Codon = Codon(">")

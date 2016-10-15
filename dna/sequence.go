@@ -12,10 +12,14 @@
 
 package dna
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/wmiller848/libdna/dna/gene"
+)
 
 type Sequence struct {
-	Codex    Codex
+	Codex    gene.Codex
 	CodexID  int
 	Index    int
 	Elements int

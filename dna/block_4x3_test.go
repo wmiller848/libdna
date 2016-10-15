@@ -12,7 +12,11 @@
 
 package dna
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/wmiller848/libdna/dna/gene"
+)
 
 func AssertBlock(b Block) {}
 
@@ -25,7 +29,7 @@ func AssertStr(t *testing.T, a, b string) bool {
 	return true
 }
 
-func AssertBase(t *testing.T, a, b Base) bool {
+func AssertBase(t *testing.T, a, b gene.Base) bool {
 	if a != b {
 		t.Error("Expected " + string(b))
 		t.Error("Got:" + string(a))
@@ -35,7 +39,7 @@ func AssertBase(t *testing.T, a, b Base) bool {
 }
 
 func InitBlock(t *testing.T) *Block4x3 {
-	codex := Codex{Codon("a"), Codon("b")}
+	codex := gene.Codex{gene.Codon("a"), gene.Codon("b")}
 	blk, err := NewBlock4x3(Block4x3Bases, codex)
 	if err != nil {
 		t.Error(err.Error())
