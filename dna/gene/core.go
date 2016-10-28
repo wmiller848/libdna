@@ -12,12 +12,20 @@
 
 package gene
 
-import (
-	"errors"
-	"fmt"
+import "errors"
+
+const (
+	cursor_open         = iota
+	cursor_braket_start = iota
+	cursor_braket_end   = iota
+
+	mode_unknown   = iota
+	mode_literal   = iota
+	mode_reference = iota
 )
 
 type Gene interface {
+	Codexs() CodexGigas
 	Type() string
 }
 
@@ -25,18 +33,19 @@ func New(codex Codex) (Gene, error) {
 	if len(codex) == 0 {
 		return nil, errors.New("Codex contains no genes")
 	}
-	switch string(codex[0]) {
-	case Codon("$").String():
-		fmt.Println("Stream")
-		return NewStreamGene(codex), nil
-	case Codon("∫").String():
-		fmt.Println("Expression")
+	switch codex[0].String() {
+	case "$":
+		//fmt.Println("Stream")
+		return NewStreamGene(codex[1:]), nil
+	case "∫":
+		//fmt.Println("Expression")
+		return NewExpressionGene(codex[1:]), nil
 		return nil, nil
-	case Codon("ƒ").String():
-		fmt.Println("Function")
+	case "ƒ":
+		//fmt.Println("Function")
 		return nil, nil
-	case Codon("»").String():
-		fmt.Println("FlowControl")
+	case "»":
+		//fmt.Println("FlowControl")
 		return nil, nil
 	default:
 		return nil, errors.New("Codex is invalid")

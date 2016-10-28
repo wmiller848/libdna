@@ -13,6 +13,8 @@
 package dna
 
 import (
+	"fmt"
+
 	"github.com/wmiller848/libdna/dna/gene"
 	dnaio "github.com/wmiller848/libdna/io"
 )
@@ -47,8 +49,11 @@ type Program struct {
 }
 
 func (p *Program) Evaluate(stream dnaio.Stream) dnaio.Stream {
-	_, err := p.dna.MarshalGenes()
+	genes, err := p.dna.MarshalGenes()
 	if err == nil {
+		for _, g := range genes {
+			fmt.Printf("%+v\n", g.Codexs())
+		}
 	}
 	return stream
 }

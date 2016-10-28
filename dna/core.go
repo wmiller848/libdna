@@ -14,12 +14,11 @@ package dna
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/wmiller848/libdna/dna/gene"
 )
 
-const Seed int = 1024
+const Seed int = 1024 * 20
 
 //const SeedMax int = 2048
 
@@ -153,22 +152,25 @@ func (d *DNA) SpliceSequence(chanSeq chan *Sequence) *SequenceNode {
 	return dnaSeq
 }
 
-func (d *DNA) MarshalGenes() ([]byte, error) {
+func (d *DNA) MarshalGenes() ([]gene.Gene, error) {
 	codexGigas := d.Unwind()
 	channel := d.Sequence(codexGigas)
 	dnaSeq := d.SpliceSequence(channel)
 	seq := dnaSeq
+	genes := []gene.Gene{}
 	for seq != nil {
 		g, err := gene.New(seq.Sequence.Codex)
-		if g != nil && err != nil {
-			fmt.Println(g)
+		if g != nil && err == nil {
+			if len(g.Codexs()) > 0 {
+				genes = append(genes, g)
+			}
 		}
 		seq = seq.Child
 	}
 
-	if dnaSeq != nil {
-		return dnaSeq.Bytes(), nil
-	} else {
-		return nil, errors.New("Unable to sequence genes")
+	if len(genes) > 0 {
+		return genes, nil
 	}
+
+	return nil, errors.New("Unable to sequence genes")
 }

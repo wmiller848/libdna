@@ -11,3 +11,27 @@
 ///////////////////////////////////////////////////////
 
 package gene
+
+import "fmt"
+
+type Expression struct {
+	genes CodexGigas
+}
+
+func (e *Expression) Codexs() CodexGigas {
+	return e.genes
+}
+
+func (e *Expression) Type() string {
+	return "expression"
+}
+
+func NewExpressionGene(codex Codex) *Expression {
+	genes := CodexGigas{}
+
+	fmt.Println(codex)
+
+	return &Expression{
+		genes: genes,
+	}
+}
