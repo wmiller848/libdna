@@ -12,7 +12,20 @@
 
 package gene
 
-import "fmt"
+const (
+	cursor_expression_open      = iota
+	cursor_expression_operator  = iota
+	cursor_expression_variable  = iota
+	cursor_expression_seperator = iota
+	cursor_expression_constant  = iota
+
+	flag_expression_off          = iota
+	flag_expression_braket_start = iota
+	flag_expression_braket_end   = iota
+
+	mode_expression_unknown = iota
+	mode_expression_valid   = iota
+)
 
 type Expression struct {
 	genes CodexGigas
@@ -27,9 +40,67 @@ func (e *Expression) Type() string {
 }
 
 func NewExpressionGene(codex Codex) *Expression {
+	flag := flag_expression_off
+	cursor := cursor_expression_open
+	mode := mode_expression_unknown
 	genes := CodexGigas{}
+	healed := Codex{}
 
-	fmt.Println(codex)
+	for _, codon := range codex {
+		switch codon.String() {
+		case "+", "-", "*", "/", "&", "|", "^":
+			if mode == mode_expression_unknown {
+				mode = mode_expression_valid
+			}
+			if cursor != cursor_expression_operator && cursor != cursor_expression_seperator && cursor != cursor_expression_variable {
+				healed = append(healed, codon)
+			}
+			cursor = cursor_expression_operator
+		case "0", "1", "2", "3", "4",
+			"5", "6", "7", "8", "9",
+			"a", "b", "c", "d", "e", "f":
+			if mode == mode_expression_valid {
+				healed = append(healed, codon)
+				if cursor != cursor_expression_variable {
+					cursor = cursor_expression_constant
+				}
+			}
+		case ",":
+			if mode == mode_expression_valid {
+				if cursor != cursor_expression_seperator && cursor != cursor_expression_operator {
+					healed = append(healed, codon)
+					cursor = cursor_expression_seperator
+				}
+			}
+		case "$":
+			if mode == mode_expression_valid {
+				if cursor != cursor_expression_variable && cursor != cursor_expression_constant {
+					healed = append(healed, codon)
+					cursor = cursor_expression_variable
+				}
+			}
+		case "[":
+			if mode == mode_expression_valid {
+				if flag != flag_expression_braket_start {
+					healed = append(healed, codon)
+					cursor = cursor_expression_seperator
+					flag = flag_expression_braket_start
+				}
+			}
+		case "]":
+			if mode == mode_expression_valid {
+				if flag == flag_expression_braket_start {
+					healed = append(healed, codon)
+					cursor = cursor_expression_seperator
+					flag = flag_expression_braket_end
+				}
+			}
+		}
+	}
+	if flag == flag_expression_braket_start {
+		healed = append(healed, Codon("]"))
+	}
+	genes = append(genes, healed)
 
 	return &Expression{
 		genes: genes,

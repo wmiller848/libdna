@@ -12,6 +12,21 @@
 
 package gene
 
+const (
+	cursor_stream_open         = iota
+	cursor_stream_seperator    = iota
+	cursor_stream_braket_start = iota
+	cursor_stream_braket_end   = iota
+
+	flag_stream_off          = iota
+	flag_stream_braket_start = iota
+	flag_stream_braket_end   = iota
+
+	mode_stream_unknown   = iota
+	mode_stream_literal   = iota
+	mode_stream_reference = iota
+)
+
 type Stream struct {
 	genes CodexGigas
 }
@@ -25,63 +40,63 @@ func (s *Stream) Type() string {
 }
 
 func NewStreamGene(codex Codex) *Stream {
-	cursor := cursor_open
-	mode := mode_unknown
+	cursor := cursor_stream_open
+	flag := flag_stream_off
+	mode := mode_stream_unknown
 	sliced := false
 	genes := CodexGigas{}
 	healed := Codex{}
 	for _, codon := range codex {
 		switch codon.String() {
 		case "0", "1", "2", "3", "4",
-			"5", "6", "7", "8", "9":
-			if mode != mode_unknown {
+			"5", "6", "7", "8", "9",
+			"a", "b", "c", "d", "e", "f":
+			if mode != mode_stream_unknown {
 				healed = append(healed, codon)
-			}
-		case "a", "b", "c", "d", "e", "f":
-			if mode != mode_unknown {
-				healed = append(healed, codon)
+				cursor = cursor_stream_open
 			}
 		case ",":
-			if cursor == cursor_braket_start && mode != mode_reference {
-				mode = mode_literal
-				if healed[len(healed)-1].String() != "[" {
-					healed = append(healed, codon)
-				}
+			if cursor != cursor_stream_braket_start && cursor != cursor_stream_seperator && flag == flag_stream_braket_start && mode != mode_stream_reference {
+				mode = mode_stream_literal
+				healed = append(healed, codon)
+				cursor = cursor_stream_seperator
 			}
 		case "$":
-			if cursor == cursor_open && mode == mode_unknown {
-				mode = mode_reference
+			if cursor == cursor_stream_open && mode == mode_stream_unknown {
+				mode = mode_stream_reference
 				healed = append(healed, codon)
 			}
 		case ":":
-			if cursor == cursor_braket_start && mode == mode_reference && !sliced {
+			if cursor == cursor_stream_braket_start && mode == mode_stream_reference && !sliced {
 				sliced = true
 				healed = append(healed, codon)
 			}
 		case "[":
-			if cursor == cursor_open {
-				cursor = cursor_braket_start
+			if cursor == cursor_stream_open && flag != flag_stream_braket_start {
+				cursor = cursor_stream_braket_start
+				flag = flag_stream_braket_start
 				healed = append(healed, codon)
 			}
 		case "]":
-			if cursor == cursor_braket_start {
-				cursor = cursor_braket_end
+			if flag == flag_stream_braket_start {
+				cursor = cursor_stream_braket_end
 				healed = append(healed, codon)
 				genes = append(genes, healed)
 				healed = Codex{}
-				cursor = cursor_open
-				mode = mode_unknown
+				cursor = cursor_stream_open
+				flag = flag_stream_braket_end
+				mode = mode_stream_unknown
 			}
 		}
 	}
-	for i, h := range genes {
+	for _, h := range genes {
 		hl := len(h)
 		if hl > 0 && h[hl-1].String() != "]" {
 			h = append(h, Codon("]"))
 		}
-		if h.String() == "[]" || h.String() == "$[]" {
-			genes[i] = nil
-		}
+		//if h.String() == "[]" || h.String() == "$[]" {
+		//genes[i] = nil
+		//}
 	}
 	//fmt.Println(genes)
 	return &Stream{

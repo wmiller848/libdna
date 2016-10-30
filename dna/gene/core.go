@@ -14,16 +14,6 @@ package gene
 
 import "errors"
 
-const (
-	cursor_open         = iota
-	cursor_braket_start = iota
-	cursor_braket_end   = iota
-
-	mode_unknown   = iota
-	mode_literal   = iota
-	mode_reference = iota
-)
-
 type Gene interface {
 	Codexs() CodexGigas
 	Type() string

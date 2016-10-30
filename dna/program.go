@@ -21,7 +21,7 @@ import (
 
 func NewProgram() (*Program, error) {
 	codex := gene.Codex{
-		gene.Codon("&"), gene.Codon("|"), gene.Codon("^"),
+		gene.Codon("&"), gene.Codon("|"), gene.Codon("^"), gene.Codon("%"),
 		gene.Codon("+"), gene.Codon("-"), gene.Codon("*"), gene.Codon("/"),
 		gene.Codon("0"), gene.Codon("1"), gene.Codon("2"), gene.Codon("3"),
 		gene.Codon("4"), gene.Codon("5"), gene.Codon("6"), gene.Codon("7"),
