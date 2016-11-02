@@ -31,6 +31,10 @@ type Stream struct {
 	genes CodexGigas
 }
 
+func (s *Stream) Nodes() []Node {
+	return NewStreamTree(s.genes)
+}
+
 func (s *Stream) Codexs() CodexGigas {
 	return s.genes
 }

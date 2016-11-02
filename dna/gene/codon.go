@@ -41,4 +41,14 @@ func (c Codex) Bytes() []byte {
 	return bytes
 }
 
+func (c Codex) Find(start int, matcher string) int {
+	cdx := c[start:]
+	for i, codon := range cdx {
+		if codon.String() == matcher {
+			return i + start
+		}
+	}
+	return -1
+}
+
 type CodexGigas []Codex

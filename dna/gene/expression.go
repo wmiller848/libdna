@@ -31,6 +31,10 @@ type Expression struct {
 	genes CodexGigas
 }
 
+func (e *Expression) Nodes() []Node {
+	return NewExpressionTree(e.genes)
+}
+
 func (e *Expression) Codexs() CodexGigas {
 	return e.genes
 }
@@ -40,8 +44,8 @@ func (e *Expression) Type() string {
 }
 
 func NewExpressionGene(codex Codex) *Expression {
-	flag := flag_expression_off
 	cursor := cursor_expression_open
+	flag := flag_expression_off
 	mode := mode_expression_unknown
 	genes := CodexGigas{}
 	healed := Codex{}
