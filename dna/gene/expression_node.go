@@ -47,15 +47,16 @@ func (n *ExpressionNode) Debug() string {
 	}
 }
 
-func NewExpressionTree(codexGigas CodexGigas, flags ...bool) []Node {
+func NewExpressionTree(codexGigas CodexGigas, nodes ...*ExpressionNode) []Node {
 	trees := []Node{}
 	mask := false
-	for _, codex := range codexGigas {
+	for i, codex := range codexGigas {
 		cursor := cursor_node_open
-		if flags != nil && flags[0] {
-			cursor = cursor_node_inception
-		}
 		var current *ExpressionNode
+		if nodes != nil && nodes[i] != nil {
+			cursor = cursor_node_inception
+			current = nodes[i]
+		}
 		var constNode *ExpressionNode
 		for i, codon := range codex {
 			switch codon.String() {
@@ -81,12 +82,6 @@ func NewExpressionTree(codexGigas CodexGigas, flags ...bool) []Node {
 				if mask {
 					continue
 				}
-				if current == nil && cursor == cursor_node_inception {
-					current = &ExpressionNode{
-						children: []*ExpressionNode{},
-						flavor:   "stream",
-					}
-				}
 
 				if cursor != cursor_node_constant {
 					constNode = &ExpressionNode{
@@ -110,12 +105,6 @@ func NewExpressionTree(codexGigas CodexGigas, flags ...bool) []Node {
 				if mask {
 					continue
 				}
-				if current == nil && cursor == cursor_node_inception {
-					current = &ExpressionNode{
-						children: []*ExpressionNode{},
-						flavor:   "stream",
-					}
-				}
 
 				if cursor != cursor_node_constant {
 					constNode = &ExpressionNode{
@@ -134,15 +123,12 @@ func NewExpressionTree(codexGigas CodexGigas, flags ...bool) []Node {
 				mask = true
 				node := &ExpressionNode{
 					children: []*ExpressionNode{},
-					flavor:   "stream_head",
+					flavor:   "stream",
 				}
 				n := i + 1
 				if n < len(codex) {
 					cdx := codex[n:codex.Find(n, "]")]
-					children := NewExpressionTree(CodexGigas{cdx}, true)
-					for _, child := range children {
-						node.children = append(node.children, child.(*ExpressionNode))
-					}
+					NewExpressionTree(CodexGigas{cdx}, node)
 				}
 				current.children = append(current.children, node)
 				cursor = cursor_node_braket_start
