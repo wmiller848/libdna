@@ -37,7 +37,7 @@ func (n *ExpressionNode) String() string {
 func (n *ExpressionNode) Debug() string {
 	children := ""
 	for _, child := range n.children {
-		children += child.String()
+		children += child.Debug()
 	}
 	switch n.value.(type) {
 	case string:
@@ -45,6 +45,28 @@ func (n *ExpressionNode) Debug() string {
 	default:
 		return n.flavor + " ( " + n.codon.String() + " " + children + ") "
 	}
+}
+
+func (n *ExpressionNode) Type() string {
+	children := ""
+	for _, child := range n.children {
+		children += child.Type()
+	}
+	sep := " "
+	var endSep, op string
+	switch n.flavor {
+	case "operator":
+		op = "∫"
+	case "constant":
+		op = "π"
+	case "variable":
+		op = "?"
+	case "stream":
+		op = "∑"
+		sep = "( "
+		endSep = ") "
+	}
+	return op + sep + children + endSep
 }
 
 func NewExpressionTree(codexGigas CodexGigas, nodes ...*ExpressionNode) []Node {

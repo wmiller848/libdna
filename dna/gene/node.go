@@ -25,4 +25,6 @@ const (
 
 type Node interface {
 	String() string
+	Debug() string
+	Type() string
 }

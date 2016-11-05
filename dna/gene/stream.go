@@ -93,17 +93,23 @@ func NewStreamGene(codex Codex) *Stream {
 			}
 		}
 	}
-	for _, h := range genes {
+	for i, h := range genes {
 		hl := len(h)
 		if hl > 0 && h[hl-1].String() != "]" {
 			h = append(h, Codon("]"))
 		}
-		//if h.String() == "[]" || h.String() == "$[]" {
-		//genes[i] = nil
-		//}
+		if h.String() == "[]" || h.String() == "$[]" {
+			genes[i] = nil
+		}
+	}
+	cleanedGenes := CodexGigas{}
+	for _, h := range genes {
+		if h != nil {
+			cleanedGenes = append(cleanedGenes, h)
+		}
 	}
 	//fmt.Println(genes)
 	return &Stream{
-		genes: genes,
+		genes: cleanedGenes,
 	}
 }
