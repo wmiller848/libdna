@@ -28,15 +28,15 @@ const (
 )
 
 type Expression struct {
-	genes CodexGigas
+	gene Codex
 }
 
-func (e *Expression) Nodes() []Node {
-	return NewExpressionTree(e.genes)
+func (e *Expression) Node() Node {
+	return NewExpressionTree(e.gene)
 }
 
-func (e *Expression) Codexs() CodexGigas {
-	return e.genes
+func (e *Expression) Codex() Codex {
+	return e.gene
 }
 
 func (e *Expression) Type() string {
@@ -47,7 +47,6 @@ func NewExpressionGene(codex Codex) *Expression {
 	cursor := cursor_expression_open
 	flag := flag_expression_off
 	mode := mode_expression_unknown
-	genes := CodexGigas{}
 	healed := Codex{}
 
 	for _, codon := range codex {
@@ -104,9 +103,8 @@ func NewExpressionGene(codex Codex) *Expression {
 	if flag == flag_expression_braket_start {
 		healed = append(healed, Codon("]"))
 	}
-	genes = append(genes, healed)
 
 	return &Expression{
-		genes: genes,
+		gene: healed,
 	}
 }

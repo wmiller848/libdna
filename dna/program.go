@@ -53,19 +53,17 @@ func (p *Program) Evaluate(stream dnaio.Stream) dnaio.Stream {
 	if err == nil {
 		fmt.Println(len(genes))
 		for _, g := range genes {
-			codex := g.Codexs()
+			codex := g.Codex()
 			if len(codex) == 0 {
 				continue
 			}
-			fmt.Printf("Codex %v : %+v\n", g.Type(), codex)
-			nodes := g.Nodes()
-			for _, node := range nodes {
-				fmt.Printf("%p\n", node)
-				if node == nil {
-					break
-				}
-				fmt.Printf("Tree %v - %+v\n", node.Type(), node.String())
+			fmt.Printf("Codex %v : %+v %v\n", g.Type(), codex, len(codex))
+			node := g.Node()
+			fmt.Printf("%p\n", node)
+			if node == nil {
+				break
 			}
+			fmt.Printf("Tree %v : %+v\n", node.Type(), node.String())
 		}
 	}
 	return stream

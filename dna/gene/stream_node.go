@@ -23,7 +23,12 @@ func (n *StreamNode) String() string {
 	for _, child := range n.children {
 		children += child.String()
 	}
-	return n.codon.String() + children
+	switch n.value.(type) {
+	case string:
+		return n.value.(string) + children
+	default:
+		return n.codon.String() + children
+	}
 }
 
 func (n *StreamNode) Debug() string {
@@ -38,44 +43,42 @@ func (n *StreamNode) Type() string {
 	return "stream"
 }
 
-func NewStreamTree(codexGigas CodexGigas) []Node {
+func NewStreamTree(codex Codex) Node {
 	cursor := cursor_node_open
-	trees := []Node{}
-	var constNode *StreamNode
-	for _, codex := range codexGigas {
-		var current *StreamNode
-		for _, codon := range codex {
-			switch codon.String() {
-			case "0", "1", "2", "3", "4",
-				"5", "6", "7", "8", "9",
-				"a", "b", "c", "d", "e", "f":
-				if cursor != cursor_node_constant {
-					constNode = &StreamNode{
-						children: []*StreamNode{},
-						codon:    codon,
-						value:    codon.String(),
-					}
-					current.children = append(current.children, constNode)
-				} else {
-					str := constNode.value.(string) + codon.String()
-					constNode.value = str
-				}
-				cursor = cursor_node_constant
-			case "$":
-				node := &StreamNode{
+	mode := mode_stream_unknown
+	var current, root, constNode *StreamNode
+	for _, codon := range codex {
+		switch codon.String() {
+		case "$":
+			node := &StreamNode{
+				children: []*StreamNode{},
+				codon:    codon,
+				value:    codon.String(),
+			}
+			if mode == mode_stream_unknown {
+				current = node
+				root = node
+				cursor = cursor_node_variable
+				mode = mode_stream_reference
+			}
+		case "[":
+		case "0", "1", "2", "3", "4",
+			"5", "6", "7", "8", "9",
+			"a", "b", "c", "d", "e", "f":
+			if cursor != cursor_node_constant {
+				constNode = &StreamNode{
 					children: []*StreamNode{},
 					codon:    codon,
 					value:    codon.String(),
 				}
-				if cursor != cursor_node_open {
-					current.children = append(current.children, node)
-				} else {
-					cursor = cursor_node_variable
-					current = node
-				}
+				current.children = append(current.children, constNode)
+			} else {
+				str := constNode.value.(string) + codon.String()
+				constNode.value = str
 			}
+			cursor = cursor_node_constant
+		case "]":
 		}
-		trees = append(trees, current)
 	}
-	return trees
+	return root
 }

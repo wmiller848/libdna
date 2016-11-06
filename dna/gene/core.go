@@ -15,8 +15,8 @@ package gene
 import "errors"
 
 type Gene interface {
-	Nodes() []Node
-	Codexs() CodexGigas
+	Node() Node
+	Codex() Codex
 	Type() string
 }
 

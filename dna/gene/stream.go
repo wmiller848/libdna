@@ -28,15 +28,15 @@ const (
 )
 
 type Stream struct {
-	genes CodexGigas
+	gene Codex
 }
 
-func (s *Stream) Nodes() []Node {
-	return NewStreamTree(s.genes)
+func (s *Stream) Node() Node {
+	return NewStreamTree(s.gene)
 }
 
-func (s *Stream) Codexs() CodexGigas {
-	return s.genes
+func (s *Stream) Codex() Codex {
+	return s.gene
 }
 
 func (s *Stream) Type() string {
@@ -48,7 +48,6 @@ func NewStreamGene(codex Codex) *Stream {
 	flag := flag_stream_off
 	mode := mode_stream_unknown
 	sliced := false
-	genes := CodexGigas{}
 	healed := Codex{}
 	for _, codon := range codex {
 		switch codon.String() {
@@ -85,7 +84,6 @@ func NewStreamGene(codex Codex) *Stream {
 			if flag == flag_stream_braket_start {
 				cursor = cursor_stream_braket_end
 				healed = append(healed, codon)
-				genes = append(genes, healed)
 				healed = Codex{}
 				cursor = cursor_stream_open
 				flag = flag_stream_braket_end
@@ -93,23 +91,14 @@ func NewStreamGene(codex Codex) *Stream {
 			}
 		}
 	}
-	for i, h := range genes {
-		hl := len(h)
-		if hl > 0 && h[hl-1].String() != "]" {
-			h = append(h, Codon("]"))
-		}
-		if h.String() == "[]" || h.String() == "$[]" {
-			genes[i] = nil
-		}
+	hl := len(healed)
+	if hl > 0 && healed[hl-1].String() != "]" {
+		healed = append(healed, Codon("]"))
 	}
-	cleanedGenes := CodexGigas{}
-	for _, h := range genes {
-		if h != nil {
-			cleanedGenes = append(cleanedGenes, h)
-		}
+	if healed.String() == "[]" || healed.String() == "$[]" {
+		healed = nil
 	}
-	//fmt.Println(genes)
 	return &Stream{
-		genes: cleanedGenes,
+		gene: healed,
 	}
 }

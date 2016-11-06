@@ -161,7 +161,7 @@ func (d *DNA) MarshalGenes() ([]gene.Gene, error) {
 	for seq != nil {
 		g, err := gene.New(seq.Sequence.Codex)
 		if g != nil && err == nil {
-			if len(g.Codexs()) > 0 {
+			if len(g.Codex()) > 0 {
 				genes = append(genes, g)
 			}
 		}
