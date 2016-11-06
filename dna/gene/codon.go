@@ -41,11 +41,19 @@ func (c Codex) Bytes() []byte {
 	return bytes
 }
 
-func (c Codex) Find(start int, matcher string) int {
+func (c Codex) Find(start int) int {
 	cdx := c[start:]
+	depth := 0
 	for i, codon := range cdx {
-		if codon.String() == matcher {
-			return i + start
+		if codon.String() == "[" {
+			depth++
+		}
+
+		if codon.String() == "]" {
+			depth--
+			if depth < 0 {
+				return i + start
+			}
 		}
 	}
 	return -1

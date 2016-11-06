@@ -150,7 +150,7 @@ func NewExpressionTree(codex Codex, nodes ...*ExpressionNode) Node {
 			}
 			n := i + 1
 			if n < len(codex) {
-				cn := codex.Find(n, "]")
+				cn := codex.Find(n)
 				var cdx Codex
 				if cn < 0 {
 					cdx = codex[n:]

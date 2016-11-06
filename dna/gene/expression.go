@@ -12,6 +12,8 @@
 
 package gene
 
+const max_depth int = 2
+
 const (
 	cursor_expression_open      = iota
 	cursor_expression_operator  = iota
@@ -89,7 +91,7 @@ func NewExpressionGene(codex Codex) *Expression {
 			}
 		case "[":
 			if mode == mode_expression_valid {
-				if flagCount < 2 {
+				if flagCount < max_depth {
 					healed = append(healed, codon)
 					cursor = cursor_expression_braket
 					flag = flag_expression_braket_start
@@ -98,7 +100,7 @@ func NewExpressionGene(codex Codex) *Expression {
 			}
 		case "]":
 			if mode == mode_expression_valid {
-				if flag == flag_expression_braket_start {
+				if flagCount > 0 {
 					healed = append(healed, codon)
 					cursor = cursor_expression_braket
 					flag = flag_expression_braket_end
