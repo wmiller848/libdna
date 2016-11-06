@@ -82,7 +82,7 @@ func NewExpressionTree(codex Codex, nodes ...*ExpressionNode) Node {
 	var constNode *ExpressionNode
 	for i, codon := range codex {
 		switch codon.String() {
-		case "+", "-", "*", "/", "&", "|", "^":
+		case "&", "|", "^", "%":
 			if mask {
 				continue
 			}
@@ -150,7 +150,13 @@ func NewExpressionTree(codex Codex, nodes ...*ExpressionNode) Node {
 			}
 			n := i + 1
 			if n < len(codex) {
-				cdx := codex[n:codex.Find(n, "]")]
+				cn := codex.Find(n, "]")
+				var cdx Codex
+				if cn < 0 {
+					cdx = codex[n:]
+				} else {
+					cdx = codex[n:cn]
+				}
 				NewExpressionTree(cdx, node)
 			}
 			current.children = append(current.children, node)

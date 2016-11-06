@@ -18,6 +18,7 @@ const (
 	cursor_expression_variable  = iota
 	cursor_expression_seperator = iota
 	cursor_expression_constant  = iota
+	cursor_expression_braket    = iota
 
 	flag_expression_off          = iota
 	flag_expression_braket_start = iota
@@ -46,16 +47,20 @@ func (e *Expression) Type() string {
 func NewExpressionGene(codex Codex) *Expression {
 	cursor := cursor_expression_open
 	flag := flag_expression_off
+	flagCount := 0
 	mode := mode_expression_unknown
 	healed := Codex{}
 
 	for _, codon := range codex {
 		switch codon.String() {
-		case "+", "-", "*", "/", "&", "|", "^":
+		case "&", "|", "^", "%":
 			if mode == mode_expression_unknown {
 				mode = mode_expression_valid
 			}
-			if cursor != cursor_expression_operator && cursor != cursor_expression_seperator && cursor != cursor_expression_variable {
+			if cursor != cursor_expression_operator &&
+				cursor != cursor_expression_seperator &&
+				cursor != cursor_expression_braket &&
+				cursor != cursor_expression_variable {
 				healed = append(healed, codon)
 			}
 			cursor = cursor_expression_operator
@@ -76,31 +81,33 @@ func NewExpressionGene(codex Codex) *Expression {
 				}
 			}
 		case "$":
-			if mode == mode_expression_valid {
-				if cursor != cursor_expression_variable && cursor != cursor_expression_constant {
+			if mode == mode_expression_valid && flag != flag_expression_braket_start {
+				if cursor != cursor_expression_variable && cursor != cursor_expression_constant && cursor != cursor_expression_braket {
 					healed = append(healed, codon)
 					cursor = cursor_expression_variable
 				}
 			}
 		case "[":
 			if mode == mode_expression_valid {
-				if flag != flag_expression_braket_start {
+				if flagCount < 2 {
 					healed = append(healed, codon)
-					cursor = cursor_expression_seperator
+					cursor = cursor_expression_braket
 					flag = flag_expression_braket_start
+					flagCount++
 				}
 			}
 		case "]":
 			if mode == mode_expression_valid {
 				if flag == flag_expression_braket_start {
 					healed = append(healed, codon)
-					cursor = cursor_expression_seperator
+					cursor = cursor_expression_braket
 					flag = flag_expression_braket_end
+					flagCount--
 				}
 			}
 		}
 	}
-	if flag == flag_expression_braket_start {
+	for i := 0; i < flagCount; i++ {
 		healed = append(healed, Codon("]"))
 	}
 

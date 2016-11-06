@@ -70,9 +70,10 @@ func NewStreamGene(codex Codex) *Stream {
 				healed = append(healed, codon)
 			}
 		case ":":
-			if cursor == cursor_stream_braket_start && mode == mode_stream_reference && !sliced {
+			if flag == flag_stream_braket_start && !sliced {
 				sliced = true
 				healed = append(healed, codon)
+				cursor = cursor_stream_seperator
 			}
 		case "[":
 			if cursor == cursor_stream_open && flag != flag_stream_braket_start {
@@ -91,11 +92,15 @@ func NewStreamGene(codex Codex) *Stream {
 			}
 		}
 	}
-	hl := len(healed)
-	if hl > 0 && healed[hl-1].String() != "]" {
+	if flag == flag_stream_braket_start &&
+		len(healed) > 0 &&
+		healed[len(healed)-1].String() != "]" {
 		healed = append(healed, Codon("]"))
 	}
-	if healed.String() == "[]" || healed.String() == "$[]" {
+	if healed.String() == "[]" ||
+		healed.String() == "$[]" ||
+		healed.String() == "[:]" ||
+		healed.String() == "$[:]" {
 		healed = nil
 	}
 	return &Stream{

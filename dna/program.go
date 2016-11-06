@@ -22,7 +22,6 @@ import (
 func NewProgram() (*Program, error) {
 	codex := gene.Codex{
 		gene.Codon("&"), gene.Codon("|"), gene.Codon("^"), gene.Codon("%"),
-		gene.Codon("+"), gene.Codon("-"), gene.Codon("*"), gene.Codon("/"),
 		gene.Codon("0"), gene.Codon("1"), gene.Codon("2"), gene.Codon("3"),
 		gene.Codon("4"), gene.Codon("5"), gene.Codon("6"), gene.Codon("7"),
 		gene.Codon("8"), gene.Codon("9"), gene.Codon("a"), gene.Codon("b"),
@@ -59,10 +58,10 @@ func (p *Program) Evaluate(stream dnaio.Stream) dnaio.Stream {
 			}
 			fmt.Printf("Codex %v : %+v %v\n", g.Type(), codex, len(codex))
 			node := g.Node()
-			fmt.Printf("%p\n", node)
 			if node == nil {
-				break
+				continue
 			}
+			fmt.Printf("%p\n", node)
 			fmt.Printf("Tree %v : %+v\n", node.Type(), node.String())
 		}
 	}

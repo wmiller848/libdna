@@ -25,7 +25,12 @@ func (n *StreamNode) String() string {
 	}
 	switch n.value.(type) {
 	case string:
-		return n.value.(string) + children
+		switch n.codon.String() {
+		case "[":
+			return "[" + children + "]"
+		default:
+			return n.value.(string) + children
+		}
 	default:
 		return n.codon.String() + children
 	}
@@ -62,6 +67,16 @@ func NewStreamTree(codex Codex) Node {
 				mode = mode_stream_reference
 			}
 		case "[":
+			node := &StreamNode{
+				children: []*StreamNode{},
+				codon:    codon,
+				value:    "",
+			}
+			if mode != mode_stream_unknown {
+				current.children = append(current.children, node)
+			}
+			current = node
+			cursor = cursor_node_braket_start
 		case "0", "1", "2", "3", "4",
 			"5", "6", "7", "8", "9",
 			"a", "b", "c", "d", "e", "f":
@@ -78,6 +93,7 @@ func NewStreamTree(codex Codex) Node {
 			}
 			cursor = cursor_node_constant
 		case "]":
+			break
 		}
 	}
 	return root
