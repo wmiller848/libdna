@@ -70,22 +70,17 @@ func (n *ExpressionNode) Type() string {
 }
 
 func NewExpressionTree(codex Codex, nodes ...*ExpressionNode) Node {
-	mask := false
 	cursor := cursor_node_open
 	var current, root *ExpressionNode
-	i := 0
-	if nodes != nil && nodes[i] != nil {
-		cursor = cursor_node_inception
-		current = nodes[i]
-		root = nodes[i]
+	if nodes != nil && nodes[0] != nil {
+		current = nodes[0]
+		root = nodes[0]
 	}
 	var constNode *ExpressionNode
-	for i, codon := range codex {
+	for i := 0; i < len(codex); i++ {
+		codon := codex[i]
 		switch codon.String() {
 		case "&", "|", "^", "%":
-			if mask {
-				continue
-			}
 			node := &ExpressionNode{
 				children: []*ExpressionNode{},
 				flavor:   "operator",
@@ -102,17 +97,13 @@ func NewExpressionTree(codex Codex, nodes ...*ExpressionNode) Node {
 		case "0", "1", "2", "3", "4",
 			"5", "6", "7", "8", "9",
 			"a", "b", "c", "d", "e", "f":
-			if mask {
-				continue
-			}
-
 			if cursor != cursor_node_constant {
 				constNode = &ExpressionNode{
 					children: []*ExpressionNode{},
 					flavor:   "constant",
+					codon:    codon,
+					value:    codon.String(),
 				}
-				constNode.codon = codon
-				constNode.value = codon.String()
 				current.children = append(current.children, constNode)
 			} else {
 				str := constNode.value.(string) + codon.String()
@@ -120,30 +111,19 @@ func NewExpressionTree(codex Codex, nodes ...*ExpressionNode) Node {
 			}
 			cursor = cursor_node_constant
 		case ",":
-			if mask {
-				continue
-			}
 			cursor = cursor_node_seperator
 		case "$":
-			if mask {
-				continue
-			}
-
 			if cursor != cursor_node_constant {
 				constNode = &ExpressionNode{
 					children: []*ExpressionNode{},
 					flavor:   "variable",
+					codon:    codon,
+					value:    codon.String(),
 				}
-				constNode.codon = codon
-				constNode.value = codon.String()
 				current.children = append(current.children, constNode)
 			}
 			cursor = cursor_node_constant
 		case "[":
-			if mask {
-				continue
-			}
-			mask = true
 			node := &ExpressionNode{
 				children: []*ExpressionNode{},
 				flavor:   "stream",
@@ -152,20 +132,18 @@ func NewExpressionTree(codex Codex, nodes ...*ExpressionNode) Node {
 			if n < len(codex) {
 				cn := codex.Find(n)
 				var cdx Codex
-				if cn < 0 {
+				if cn <= 0 {
 					cdx = codex[n:]
+					cn = len(codex) - 1
 				} else {
 					cdx = codex[n:cn]
 				}
+				i = cn - 1
 				NewExpressionTree(cdx, node)
+				current.children = append(current.children, node)
+				cursor = cursor_node_braket_start
 			}
-			current.children = append(current.children, node)
-			cursor = cursor_node_braket_start
 		case "]":
-			if cursor != cursor_node_braket_start {
-				break
-			}
-			mask = false
 			cursor = cursor_node_braket_end
 		}
 	}

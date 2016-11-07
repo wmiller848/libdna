@@ -50,7 +50,6 @@ type Program struct {
 func (p *Program) Evaluate(stream dnaio.Stream) dnaio.Stream {
 	genes, err := p.dna.MarshalGenes()
 	if err == nil {
-		fmt.Println(len(genes))
 		for _, g := range genes {
 			codex := g.Codex()
 			if len(codex) == 0 {
@@ -61,7 +60,6 @@ func (p *Program) Evaluate(stream dnaio.Stream) dnaio.Stream {
 			if node == nil {
 				continue
 			}
-			fmt.Printf("%p\n", node)
 			fmt.Printf("Tree %v : %+v\n", node.Type(), node.String())
 		}
 	}
