@@ -25,6 +25,7 @@ const (
 	mode_stream_unknown   = iota
 	mode_stream_literal   = iota
 	mode_stream_reference = iota
+	mode_stream_inception = iota
 )
 
 type Stream struct {
@@ -46,6 +47,7 @@ func (s *Stream) Type() string {
 func NewStreamGene(codex Codex) *Stream {
 	cursor := cursor_stream_open
 	flag := flag_stream_off
+	flagCount := 0
 	mode := mode_stream_unknown
 	sliced := false
 	healed := Codex{}
@@ -59,8 +61,7 @@ func NewStreamGene(codex Codex) *Stream {
 				cursor = cursor_stream_open
 			}
 		case ",":
-			if cursor != cursor_stream_braket_start && cursor != cursor_stream_seperator && flag == flag_stream_braket_start && mode != mode_stream_reference {
-				mode = mode_stream_literal
+			if cursor != cursor_stream_seperator && flag == flag_stream_braket_start && mode != mode_stream_reference {
 				healed = append(healed, codon)
 				cursor = cursor_stream_seperator
 			}
@@ -70,31 +71,39 @@ func NewStreamGene(codex Codex) *Stream {
 				healed = append(healed, codon)
 			}
 		case ":":
-			if flag == flag_stream_braket_start && !sliced {
+			if flag == flag_stream_braket_start && !sliced && mode == mode_stream_reference {
 				sliced = true
 				healed = append(healed, codon)
 				cursor = cursor_stream_seperator
 			}
 		case "[":
-			if cursor == cursor_stream_open && flag != flag_stream_braket_start {
-				cursor = cursor_stream_braket_start
-				flag = flag_stream_braket_start
+			if mode == mode_stream_unknown {
+				mode = mode_stream_literal
+			}
+			cursor = cursor_stream_braket_start
+			flag = flag_stream_braket_start
+			if mode == mode_stream_literal && flagCount < max_depth {
+				flagCount++
+				healed = append(healed, codon)
+			} else if mode == mode_stream_reference && flagCount == 0 {
+				flagCount++
 				healed = append(healed, codon)
 			}
 		case "]":
-			if flag == flag_stream_braket_start {
+			if flagCount > 0 {
 				cursor = cursor_stream_braket_end
 				healed = append(healed, codon)
-				healed = Codex{}
-				cursor = cursor_stream_open
 				flag = flag_stream_braket_end
-				mode = mode_stream_unknown
+				flagCount--
+				if flagCount == 0 {
+					healed = Codex{}
+					cursor = cursor_stream_open
+					mode = mode_stream_unknown
+				}
 			}
 		}
 	}
-	if flag == flag_stream_braket_start &&
-		len(healed) > 0 &&
-		healed[len(healed)-1].String() != "]" {
+	for i := 0; i < flagCount; i++ {
 		healed = append(healed, Codon("]"))
 	}
 	if healed.String() == "[]" ||

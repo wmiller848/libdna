@@ -71,12 +71,11 @@ func (n *ExpressionNode) Type() string {
 
 func NewExpressionTree(codex Codex, nodes ...*ExpressionNode) Node {
 	cursor := cursor_node_open
-	var current, root *ExpressionNode
+	var current, root, constNode *ExpressionNode
 	if nodes != nil && nodes[0] != nil {
 		current = nodes[0]
 		root = nodes[0]
 	}
-	var constNode *ExpressionNode
 	for i := 0; i < len(codex); i++ {
 		codon := codex[i]
 		switch codon.String() {
@@ -100,9 +99,9 @@ func NewExpressionTree(codex Codex, nodes ...*ExpressionNode) Node {
 			if cursor != cursor_node_constant {
 				constNode = &ExpressionNode{
 					children: []*ExpressionNode{},
-					flavor:   "constant",
 					codon:    codon,
 					value:    codon.String(),
+					flavor:   "constant",
 				}
 				current.children = append(current.children, constNode)
 			} else {
@@ -116,9 +115,9 @@ func NewExpressionTree(codex Codex, nodes ...*ExpressionNode) Node {
 			if cursor != cursor_node_constant {
 				constNode = &ExpressionNode{
 					children: []*ExpressionNode{},
-					flavor:   "variable",
 					codon:    codon,
 					value:    codon.String(),
+					flavor:   "variable",
 				}
 				current.children = append(current.children, constNode)
 			}

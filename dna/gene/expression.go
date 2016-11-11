@@ -12,8 +12,6 @@
 
 package gene
 
-const max_depth int = 2
-
 const (
 	cursor_expression_open      = iota
 	cursor_expression_operator  = iota

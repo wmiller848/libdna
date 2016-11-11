@@ -12,6 +12,8 @@
 
 package gene
 
+const max_depth int = 2
+
 const (
 	cursor_node_open         = iota
 	cursor_node_constant     = iota
