@@ -13,8 +13,6 @@
 package dna
 
 import (
-	"fmt"
-
 	"github.com/wmiller848/libdna/dna/gene"
 	dnaio "github.com/wmiller848/libdna/io"
 )
@@ -50,18 +48,9 @@ type Program struct {
 func (p *Program) Evaluate(stream dnaio.Stream) dnaio.Stream {
 	genes, err := p.dna.MarshalGenes()
 	if err == nil {
-		for _, g := range genes {
-			codex := g.Codex()
-			if len(codex) == 0 {
-				continue
-			}
-			fmt.Printf("Codex %v : %+v %v\n", g.Type(), codex, len(codex))
-			node := g.Node()
-			if node == nil {
-				continue
-			}
-			fmt.Printf("Tree %v : %+v\n", node.Type(), node.String())
-		}
+		context := gene.NewContext(genes)
+		return context.Evaluate(stream)
 	}
-	return stream
+
+	return nil
 }

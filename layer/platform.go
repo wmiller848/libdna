@@ -12,9 +12,7 @@
 
 package layer
 
-import (
-	dnaio "github.com/wmiller848/libdna/io"
-)
+import dnaio "github.com/wmiller848/libdna/io"
 
 type PlatformLayerHandler func(dnaio.Buffer) dnaio.Stream
 

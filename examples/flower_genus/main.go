@@ -53,5 +53,19 @@ func main() {
 		AddLayer(csvLayer).
 		AddLayer(classifyLayer)
 
-	model.Run(os.Stdin)
+	count := 0
+	thing := model.Run(os.Stdin, func(out dnaio.Buffer) bool {
+		count++
+		if count >= 1 {
+			return true
+		}
+		return false
+	})
+	for {
+		buf, open := <-thing
+		if !open {
+			return
+		}
+		fmt.Println("Buffer", string(buf))
+	}
 }

@@ -41,6 +41,16 @@ func (c Codex) Bytes() []byte {
 	return bytes
 }
 
+func (c Codex) Interface() [][]byte {
+	// TODO
+	// Get []Codon -> [][]byte not copy :(
+	bytes := make([][]byte, len(c))
+	for i, codon := range c {
+		bytes[i] = codon
+	}
+	return bytes
+}
+
 func (c Codex) Find(start int) int {
 	cdx := c[start:]
 	depth := 0

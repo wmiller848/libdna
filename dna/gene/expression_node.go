@@ -34,19 +34,6 @@ func (n *ExpressionNode) String() string {
 	}
 }
 
-func (n *ExpressionNode) Debug() string {
-	children := ""
-	for _, child := range n.children {
-		children += child.Debug()
-	}
-	switch n.value.(type) {
-	case string:
-		return n.flavor + " ( " + n.value.(string) + " " + children + ") "
-	default:
-		return n.flavor + " ( " + n.codon.String() + " " + children + ") "
-	}
-}
-
 func (n *ExpressionNode) Type() string {
 	children := ""
 	for _, child := range n.children {
@@ -67,6 +54,11 @@ func (n *ExpressionNode) Type() string {
 		endSep = ") "
 	}
 	return op + sep + children + endSep
+}
+
+func (n *ExpressionNode) Evaluate(runtime *Runtime) Codex {
+	//fmt.Println("Codex", n.Type(), n.String())
+	return Codex{}
 }
 
 func NewExpressionTree(codex Codex, nodes ...*ExpressionNode) Node {

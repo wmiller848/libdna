@@ -25,23 +25,19 @@ func (n *StreamNode) String() string {
 		children += child.String()
 	}
 	switch n.flavor {
-	case "inception", "reference", "literal":
-		return n.flavor + " ( " + n.value.(string) + " " + children + ") "
+	case "buffer", "reference", "literal":
+		return n.flavor + "( " + n.value.(string) + " " + children + " )"
 	default:
 		return n.value.(string) + " " + children
 	}
 }
 
-func (n *StreamNode) Debug() string {
-	children := ""
-	for _, child := range n.children {
-		children += child.Debug()
-	}
-	return n.codon.String() + children
-}
-
 func (n *StreamNode) Type() string {
 	return "stream"
+}
+
+func (n *StreamNode) Evaluate(runtime *Runtime) Codex {
+	return Codex{}
 }
 
 func NewStreamTree(codex Codex, nodes ...*StreamNode) Node {
@@ -129,7 +125,7 @@ func NewStreamTree(codex Codex, nodes ...*StreamNode) Node {
 	} else if mode == mode_stream_literal {
 		root.flavor = "literal"
 	} else if mode == mode_stream_inception {
-		root.flavor = "inception"
+		root.flavor = "buffer"
 	}
 	return root
 }

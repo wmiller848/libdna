@@ -13,12 +13,13 @@
 package libdna
 
 import (
-	"fmt"
 	"io"
 
 	dnaio "github.com/wmiller848/libdna/io"
 	"github.com/wmiller848/libdna/layer"
 )
+
+type Iterator func(dnaio.Buffer) bool
 
 func New() *Model {
 	return &Model{}
@@ -35,30 +36,38 @@ func (m *Model) AddLayer(l layer.Layer) *Model {
 	return m
 }
 
-func (m *Model) Run(stdin io.Reader) {
-	signal := make(chan int)
-	generation := 1
-	//flood := dnaio.IoReader(stdin)
-	flood := dnaio.IoReaderCached(stdin, signal)
-
-	for {
-		m.currentLayer = 0
+func (m *Model) Run(stdin io.Reader, iterator Iterator) chan dnaio.Buffer {
+	streams := make(chan dnaio.Buffer)
+	go func() {
+		signal := make(chan int)
+		generation := 0
+		//flood := dnaio.IoReader(stdin)
+		flood := dnaio.IoReaderCached(stdin, signal)
+		m.reset()
 		out := m.pipe(flood, m.nextLayer())
 		for {
-			stream, open := <-out
-			if !open {
-				break
-			}
-			fmt.Println(stream.String(), open, generation)
-			if m.Trained || generation == 10 {
+			go func() {
+				for {
+					stream, open := <-out
+					if len(stream) > 0 {
+						//term := iterator(stream.Flatten())
+						streams <- stream.Flatten()
+					}
+					if !open {
+						close(streams)
+						return
+					}
+				}
+			}()
+			generation++
+			if generation == 2 {
 				close(signal)
 				return
-			} else {
-				generation++
-				signal <- generation
 			}
+			signal <- generation
 		}
-	}
+	}()
+	return streams
 }
 
 func (m *Model) pipe(flood dnaio.Flood, l layer.Layer) dnaio.Flood {
@@ -69,16 +78,19 @@ func (m *Model) pipe(flood dnaio.Flood, l layer.Layer) dnaio.Flood {
 	go func() {
 		for {
 			stream, open := <-flood
-			if len(stream) > 0 {
-				downstream <- l.Pipe(stream)
-			}
 			if !open {
+				// Flush the stream
+				downstream <- l.Pipe(stream)
 				close(downstream)
 				return
 			}
+			if len(stream) > 0 {
+				downstream <- l.Pipe(stream)
+			}
 		}
 	}()
-	return m.pipe(downstream, m.nextLayer())
+	nextLayer := m.nextLayer()
+	return m.pipe(downstream, nextLayer)
 }
 
 func (m *Model) nextLayer() layer.Layer {
@@ -92,4 +104,8 @@ func (m *Model) nextLayer() layer.Layer {
 
 func (m *Model) tickLayer() {
 	m.currentLayer++
+}
+
+func (m *Model) reset() {
+	m.currentLayer = 0
 }

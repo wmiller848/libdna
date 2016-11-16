@@ -12,12 +12,17 @@
 
 package gene
 
-import "errors"
+import (
+	"errors"
+
+	dnaio "github.com/wmiller848/libdna/io"
+)
 
 type Gene interface {
 	Node() Node
 	Codex() Codex
 	Type() string
+	Evaluate(*Runtime) dnaio.Stream
 }
 
 func New(codex Codex) (Gene, error) {

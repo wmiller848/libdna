@@ -59,8 +59,6 @@ func IoReader(rdr io.Reader) Flood {
 
 func IoReaderCached(rdr io.Reader, signal chan int) Flood {
 	flood := make(Flood)
-	buf := make(Buffer, BUFFER_SIZE)
-	var lastLn Buffer
 	go func() {
 		tmpfile, err := ioutil.TempFile("", "flood")
 		if err != nil {
@@ -68,6 +66,7 @@ func IoReaderCached(rdr io.Reader, signal chan int) Flood {
 			return
 		}
 
+		buf := make(Buffer, BUFFER_SIZE)
 		for {
 			n, err := rdr.Read(buf)
 			if err == io.EOF {
@@ -82,39 +81,47 @@ func IoReaderCached(rdr io.Reader, signal chan int) Flood {
 		tmpfile.Sync()
 		defer tmpfile.Close()
 		defer os.Remove(tmpfile.Name())
-
 		for {
-			go func() {
-				tmpfile.Seek(0, 0)
-				for {
-					n, err := tmpfile.Read(buf)
-					if err == io.EOF {
-						if len(lastLn) > 0 {
-							flood <- Stream{lastLn}
-						}
-						lastLn = nil
-						break
-					}
-
-					if bytes.Count(buf[:n], []byte("\n")) == 0 {
-						lastLn = append(lastLn, buf[:n]...)
-						continue
-					}
-					ln := bytes.Split(buf[:n], []byte("\n"))
-					for i := 0; i < len(ln); i++ {
-						if len(ln[i]) > 0 {
-							flood <- Stream{append(lastLn, Buffer(ln[i])...)}
-						}
-					}
-					lastLn = ln[len(ln)-1]
-				}
-			}()
-			_, open := <-signal
-			if !open {
+			done := ReadIO(tmpfile, flood)
+			<-done
+			i, open := <-signal
+			if i < 0 || !open {
 				close(flood)
 				return
 			}
 		}
 	}()
 	return flood
+}
+
+func ReadIO(tmpfile *os.File, flood Flood) chan bool {
+	done := make(chan bool)
+	go func() {
+		buf := make(Buffer, BUFFER_SIZE)
+		var lastLn Buffer
+		tmpfile.Seek(0, 0)
+		for {
+			n, err := tmpfile.Read(buf)
+			if err == io.EOF {
+				if len(lastLn) > 0 {
+					flood <- Stream{lastLn}
+				}
+				done <- true
+				return
+			}
+
+			if bytes.Count(buf[:n], []byte("\n")) == 0 {
+				lastLn = append(lastLn, buf[:n]...)
+				continue
+			}
+			ln := bytes.Split(buf[:n], []byte("\n"))
+			for i := 0; i < len(ln); i++ {
+				if len(ln[i]) > 0 {
+					flood <- Stream{append(lastLn, Buffer(ln[i])...)}
+				}
+			}
+			lastLn = ln[len(ln)-1]
+		}
+	}()
+	return done
 }

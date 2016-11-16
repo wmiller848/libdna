@@ -13,6 +13,8 @@
 package layer
 
 import (
+	"fmt"
+
 	dnaio "github.com/wmiller848/libdna/io"
 )
 
@@ -33,6 +35,7 @@ type UserLayer struct {
 }
 
 func (l *UserLayer) Pipe(stream dnaio.Stream) dnaio.Stream {
+	fmt.Println("USER-PIPE", stream)
 	return l.Config.Handler(stream)
 }
 

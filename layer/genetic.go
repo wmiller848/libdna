@@ -50,11 +50,18 @@ func (l *GeneticLayer) Pipe(stream dnaio.Stream) dnaio.Stream {
 			points := make(map[int]int)
 			streamLen := len(stream)
 
+			if streamLen <= 0 {
+				return stream
+			}
+
 			dataStream := stream[:streamLen-1]
 			assertStream := dnaio.Stream{stream[streamLen-1]}
 
 			//
+			//fmt.Printf("%p ", l)
+			//fmt.Println(len(l.programs), "PROGRAMS =================")
 			for i, _ := range l.programs {
+				//fmt.Printf("%v - %p %v\n", i, l.programs[i], stream)
 				points[i] = 0
 				outputStream := l.programs[i].Evaluate(dataStream)
 				if len(outputStream) == len(assertStream) {
@@ -83,7 +90,7 @@ func (l *GeneticLayer) Pipe(stream dnaio.Stream) dnaio.Stream {
 			// Unsupervised
 
 		}
-		return dnaio.Stream{}
+		return stream
 	}
 	return stream
 }

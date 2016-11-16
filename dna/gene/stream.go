@@ -12,6 +12,10 @@
 
 package gene
 
+import (
+	dnaio "github.com/wmiller848/libdna/io"
+)
+
 const (
 	cursor_stream_open         = iota
 	cursor_stream_seperator    = iota
@@ -26,23 +30,9 @@ const (
 	mode_stream_literal   = iota
 	mode_stream_reference = iota
 	mode_stream_inception = iota
+
+	gene_type_stream = "stream"
 )
-
-type Stream struct {
-	gene Codex
-}
-
-func (s *Stream) Node() Node {
-	return NewStreamTree(s.gene)
-}
-
-func (s *Stream) Codex() Codex {
-	return s.gene
-}
-
-func (s *Stream) Type() string {
-	return "stream"
-}
 
 func NewStreamGene(codex Codex) *Stream {
 	cursor := cursor_stream_open
@@ -115,4 +105,26 @@ func NewStreamGene(codex Codex) *Stream {
 	return &Stream{
 		gene: healed,
 	}
+}
+
+type Stream struct {
+	gene Codex
+}
+
+func (s *Stream) Node() Node {
+	return NewStreamTree(s.gene)
+}
+
+func (s *Stream) Codex() Codex {
+	return s.gene
+}
+
+func (s *Stream) Type() string {
+	return gene_type_stream
+}
+
+func (s *Stream) Evaluate(runtime *Runtime) dnaio.Stream {
+	node := s.Node()
+	codex := node.Evaluate(runtime)
+	return codex.Interface()
 }

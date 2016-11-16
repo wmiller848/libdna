@@ -12,6 +12,10 @@
 
 package gene
 
+import (
+	dnaio "github.com/wmiller848/libdna/io"
+)
+
 const (
 	cursor_expression_open      = iota
 	cursor_expression_operator  = iota
@@ -26,23 +30,9 @@ const (
 
 	mode_expression_unknown = iota
 	mode_expression_valid   = iota
+
+	gene_type_expression = "expression"
 )
-
-type Expression struct {
-	gene Codex
-}
-
-func (e *Expression) Node() Node {
-	return NewExpressionTree(e.gene)
-}
-
-func (e *Expression) Codex() Codex {
-	return e.gene
-}
-
-func (e *Expression) Type() string {
-	return "expression"
-}
 
 func NewExpressionGene(codex Codex) *Expression {
 	cursor := cursor_expression_open
@@ -114,4 +104,26 @@ func NewExpressionGene(codex Codex) *Expression {
 	return &Expression{
 		gene: healed,
 	}
+}
+
+type Expression struct {
+	gene Codex
+}
+
+func (e *Expression) Node() Node {
+	return NewExpressionTree(e.gene)
+}
+
+func (e *Expression) Codex() Codex {
+	return e.gene
+}
+
+func (e *Expression) Type() string {
+	return gene_type_expression
+}
+
+func (e *Expression) Evaluate(runtime *Runtime) dnaio.Stream {
+	node := e.Node()
+	codex := node.Evaluate(runtime)
+	return codex.Interface()
 }
